@@ -2,11 +2,23 @@ import uvicorn
 
 from fastapi import FastAPI
 
-from config import Settings
+from database import connect as db_connect, disconnect as db_disconnect
+from endpoints import router
+from config import settings
 
 
 app = FastAPI()
-settings = Settings()
+app.include_router(router)
+
+
+@app.on_event('startup')
+async def connect_db():
+    await db_connect()
+
+
+@app.on_event('shutdown')
+async def disconnect_db():
+    await db_disconnect()
 
 
 if __name__ == '__main__':
